@@ -1,0 +1,225 @@
+<html lang="en" class="">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style class="cp-pen-styles">
+        @import url("https://fonts.googleapis.com/css?family=Kavivanar");
+        * {
+        border: 0;
+        margin: 0;
+        padding: 0;
+        }
+        .flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        }
+        .caixa {
+        border: 1px solid #000;
+        width: 200px;
+        margin: 0 20px;
+        flex-direction: column;
+        }
+        .imagem {
+        width: 180px;
+        height: 180px;
+        padding: 10px;
+        }
+        .btn,
+        .info {
+        background: #fff;
+        color: #1064d4;
+        margin: 0 3px;
+        cursor: pointer;
+        }
+        .btn {
+        height: 26px;
+        width: 62px;
+        }
+        .info {
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
+        }
+        .diag {
+        background: #1064d4;
+        height: 40px;
+        width: 100%;
+        }
+        .titulo {
+        color: #1064d4;
+        padding: 0 10px 10px 10px;
+        font-weight: 100;
+        font-family: 'Kavivanar', cursive;
+        }
+        .modal{
+            
+            z-index: 50;
+            width: 100vw;
+            height: 100vh;
+            background: #0003
+        }
+        .cont{
+            width: 25vw;
+            height: 25vh;
+        }
+        </style>
+    </head>
+    <body onload="ajax()">
+        <main>
+            <section id="jogos"></section>
+        </main>
+    <script>
+        
+        var dados;
+        var ajax = function () {
+            var ajax = new XMLHttpRequest();
+            ajax.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    dados = JSON.parse(this.responseText);
+                    dados.forEach(caixa);
+                    dados.forEach(titulo);
+                }
+            };
+            ajax.open("GET", "http://localhost:8080/jogos/");
+            ajax.send();
+        };
+        function titulo(val){
+            console.log(val.titulo);
+        }
+        function caixa(val){
+            var inferior = document.createElement('header');
+            var superior = document.createElement('section');
+            superior.classList.add('caixa','flex');
+            superior.id = val.us;
+            inferior.classList.add('imagem','flex');
+            superior.appendChild(inferior);
+            inferior = document.createElement('main');
+            inferior.classList.add('titulo','flex');
+            superior.appendChild(inferior);
+            inferior = document.createElement('footer');
+            inferior.classList.add('diag','flex');
+            superior.appendChild(inferior);
+            inferior = document.createElement('img');
+            inferior.src = ' https://store.playstation.com/store/api/chihiro/00_09_000/container/US/en/999/' + val.us + '/' + val.img + '/image?w=180&h=180&bg_color=000000&opacity=100&_version=00_09_000';
+            superior.querySelector('header').appendChild(inferior);
+            inferior = document.createElement('h3')
+            inferior.innerHTML = val.titulo;
+            superior.querySelector('main').appendChild(inferior);
+            inferior = document.createElement('button');
+            inferior.value = val.us;
+            inferior.setAttribute('onclick','desvio(this.value)');
+            inferior.classList.add("flex","btn");
+            inferior.innerHTML = 'Comprar';
+            superior.querySelector('footer').appendChild(inferior);
+            inferior = document.createElement('select');
+            inferior.id = 'seletor-'+val.us;
+            superior.querySelector('footer').appendChild(inferior);
+            inferior = document.createElement('button');
+            inferior.classList.add("flex","info");
+            inferior.innerHTML = 'i';
+            superior.querySelector('footer').appendChild(inferior);
+            inferior = document.createElement('option');
+            inferior.value = '1';
+            inferior.innerHTML = 'us';
+            superior.querySelector('footer').querySelector('select').appendChild(inferior);
+            inferior = document.createElement('option');
+            inferior.value = '2';
+            inferior.innerHTML = 'ca';
+            superior.querySelector('footer').querySelector('select').appendChild(inferior);
+            inferior = document.createElement('option');
+            inferior.value = '3';
+            inferior.innerHTML = 'mx';
+            superior.querySelector('footer').querySelector('select').appendChild(inferior);
+            inferior = document.createElement('option');
+            inferior.value = '4';
+            inferior.innerHTML = 'br';
+            superior.querySelector('footer').querySelector('select').appendChild(inferior);
+            document.getElementById('jogos').appendChild(superior);
+            switch(val.grupo){
+                case 1:
+                    inferior = document.createElement('input');
+                    inferior.setAttribute('type','hidden');
+                    inferior.id = 'grupo-'+val.us;
+                    inferior.value = 1;
+                    superior.appendChild(inferior);
+                    break;
+                case 2:
+                    inferior = document.createElement('input');
+                    inferior.setAttribute('type','hidden');
+                    inferior.id = 'grupo-'+val.us;
+                    inferior.value = 2;
+                    inferior.setAttribute('br',val.br);
+                    superior.appendChild(inferior);
+                    break;
+                case 3:
+                    inferior = document.createElement('input');
+                    inferior.id = 'grupo-'+val.us;
+                    inferior.setAttribute('type','hidden');
+                    inferior.value = 3;
+                    inferior.setAttribute('br',val.br);
+                    superior.appendChild(inferior);
+                    break;
+                case 4:
+                    inferior = document.createElement('input');
+                    inferior.setAttribute('type','hidden');
+                    inferior.id = 'grupo-'+val.us;
+                    inferior.value = 4;
+                    inferior.setAttribute('mx',val.mx);
+                    inferior.setAttribute('br',val.br);
+                    superior.appendChild(inferior);
+                    break;
+            }
+        }
+        function desvio(id_base){
+            var paises = ['en-us','fr-ca','es-mx','pt-br'];
+            var pais = parseInt(document.getElementById('seletor-'+id_base).value);
+            var links = document.querySelector('#grupo-'+id_base);
+            switch(parseInt(links.value)){
+                case 1:
+                    window.open('https://store.playstation.com/'+paises[pais-1]+'/product/'+id_base);
+                    break;
+                case 2:
+                    switch(pais){
+                        case 1:
+                        case 2:
+                            window.open('https://store.playstation.com/'+paises[pais-1]+'/product/'+id_base);
+                            break;
+                        case 3:
+                        case 4:
+                            window.open('https://store.playstation.com/'+paises[pais-1]+'/product/'+links.getAttribute('br'));
+                            break;
+                    }
+                    break;
+                case 3:
+                    switch(pais){
+                        case 1:
+                        case 2:
+                        case 3:
+                            window.open('https://store.playstation.com/'+paises[pais-1]+'/product/'+id_base);
+                            break;
+                        case 4:
+                            window.open('https://store.playstation.com/'+paises[pais-1]+'/product/'+links.getAttribute('br'));
+                            break;
+                    }
+                    break;
+                case 4:
+                    switch(pais){
+                        case 1:
+                        case 2:
+                            window.open('https://store.playstation.com/'+paises[pais-1]+'/product/'+id_base);
+                            break;
+                        case 3:
+                            window.open('https://store.playstation.com/'+paises[pais-1]+'/product/'+links.getAttribute('mx'));
+                            break;
+                        case 4:
+                            window.open('https://store.playstation.com/'+paises[pais-1]+'/product/'+links.getAttribute('br'));
+                            break;
+                    }
+                    break;
+                
+            }
+        }
+        </script>
+    </body>
+</html>
